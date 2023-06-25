@@ -17,6 +17,14 @@ class PackageController extends Controller
         return view('project.all', ['data' => $packages]);
     }
 
+    public function listAll()
+    {
+        $packages = Package::latest()->get();
+        return response()->json([
+            'data' => $packages,
+        ], 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -32,8 +40,8 @@ class PackageController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "price" => "required",
-            "unit" => "required"
+            "price" => "required|numeric",
+            "unit" => "required|numeric"
         ]);
 
         $total = $request->price * $request->unit;
@@ -44,6 +52,26 @@ class PackageController extends Controller
         $package->price_unity = $request->price;
         $package->save();
         return redirect('/project');
+    }
+
+    public function projectCreate(Request $request)
+    {
+        $request->validate([
+            "name" => "required",
+            "price" => "required|numeric",
+            "unit" => "required|numeric"
+        ]);
+
+        $total = $request->price * $request->unit;
+        $package = new Package;
+        $package->name = $request->name;
+        $package->unity = $request->unit;
+        $package->total = $total;
+        $package->price_unity = $request->price;
+        $package->save();
+        return response()->json([
+            'message' => 'Request send'
+        ], 200);
     }
 
     /**
@@ -80,6 +108,15 @@ class PackageController extends Controller
         return redirect('/project/all');
     }
 
+    public function delete($package)
+    {
+        $package = Package::find($package);
+        $package->delete();
+        return response()->json([
+            'message' => 'Package deleted'
+        ], 200);
+    }
+
     public function financeList()
     {
         $packages = Package::where('status', 'pending')->get();
@@ -106,6 +143,16 @@ class PackageController extends Controller
         }
     }
 
+    public function rejectApi($id)
+    {
+        $package = Package::find($id)->first();
+        $package->status = 'rejected';
+        $package->update();
+        return response()->json([
+            'message' => 'Package rejected'
+        ], 200);
+    }
+
     public function generalList()
     {
         $packages = Package::where('status', 'financeApproved')->get();
@@ -118,5 +165,19 @@ class PackageController extends Controller
         $package->status = 'generalApproved';
         $package->update();
         return redirect('/general');
+    }
+
+    public function approveApi($id)
+    {
+        $package = Package::find($id)->first();
+        if (Auth::guard('api')->user()->role == 'finance') {
+            $package->status = 'financeApproved';
+        } else {
+            $package->status = 'generalApproved';
+        }
+        $package->update();
+        return response()->json([
+            'message' => 'Package Approved'
+        ], 200);
     }
 }

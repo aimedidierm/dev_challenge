@@ -24,7 +24,7 @@ composer install
 
 Create your database (You can Use MySQL or PostgreSQL)
 
-Crete .env file with the following configuration
+Create .env file with the following configuration
 
 ```bash
 DB_CONNECTION=mysql

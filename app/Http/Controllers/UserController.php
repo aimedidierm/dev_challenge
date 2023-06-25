@@ -72,9 +72,14 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit()
     {
-        //
+        $user = User::where('id', Auth::guard('api')->id())->first();
+        if ($user != null) {
+            return response()->json(['user' => $user], 200);
+        } else {
+            return response()->json(['error' => 'Not allowed'], 401);
+        }
     }
 
     /**
@@ -84,7 +89,7 @@ class UserController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "email" => "required|email",
+            "email" => "required|email|unique:users",
             "password" => "required",
             "confirmPassword" => "required"
         ]);
@@ -111,6 +116,24 @@ class UserController extends Controller
                 return redirect('/project/settings')->withErrors(['msg' => 'Passwords not match']);
             }
         }
+    }
+
+    public function updateApi(Request $request)
+    {
+        $request->validate([
+            "name" => "required",
+            "email" => "required|email|unique:users",
+            "password" => "required"
+        ]);
+
+        $user = User::where('id', Auth::guard('api')->id())->first();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->update();
+        return response()->json([
+            'message' => 'User details updated'
+        ], 200);
     }
 
     /**
