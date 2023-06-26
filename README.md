@@ -46,3 +46,4 @@ php artisan migrate --seed
 ```bash
 php artisan serve
 ```
+And don't forget to install Laravel\Passport
