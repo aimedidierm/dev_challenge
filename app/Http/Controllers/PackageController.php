@@ -17,9 +17,17 @@ class PackageController extends Controller
         return view('project.all', ['data' => $packages]);
     }
 
+    public function financeListAll()
+    {
+        $packages = Package::where('status', 'pending')->get();
+        return response()->json([
+            'data' => $packages,
+        ], 200);
+    }
+
     public function listAll()
     {
-        $packages = Package::latest()->get();
+        $packages = Package::where('status', 'financeApproved')->get();
         return response()->json([
             'data' => $packages,
         ], 200);

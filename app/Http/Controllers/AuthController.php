@@ -91,7 +91,7 @@ class AuthController extends Controller
     public function mobileRegister(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
+            "email" => "required|email|unique:users",
             "names" => "required",
             "role" => "required|in:project,finance",
             "password" => "required",

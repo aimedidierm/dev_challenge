@@ -17,6 +17,14 @@ class UserController extends Controller
         return view('general.users', ['data' => $users]);
     }
 
+    public function listApi()
+    {
+        $users = User::where('status', false)->get();
+        return response()->json([
+            'data' => $users,
+        ], 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -41,7 +49,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
+            "email" => "required|email|unique:users",
             "names" => "required",
             "role" => "required|in:project,finance",
             "password" => "required",
@@ -89,7 +97,7 @@ class UserController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "email" => "required|email|unique:users",
+            "email" => "required|email",
             "password" => "required",
             "confirmPassword" => "required"
         ]);
@@ -122,7 +130,7 @@ class UserController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "email" => "required|email|unique:users",
+            "email" => "required|email",
             "password" => "required"
         ]);
 
@@ -152,5 +160,24 @@ class UserController extends Controller
         $user->status = true;
         $user->update();
         return redirect('/general/users');
+    }
+
+    public function rejectApi($id)
+    {
+        $user = User::find($id)->first();
+        $user->delete;
+        return response()->json([
+            'message' => 'User rejected'
+        ], 200);
+    }
+
+    public function approveApi($id)
+    {
+        $user = User::find($id)->first();
+        $user->status = true;
+        $user->update();
+        return response()->json([
+            'message' => 'User approved'
+        ], 200);
     }
 }

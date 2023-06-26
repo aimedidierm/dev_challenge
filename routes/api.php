@@ -33,7 +33,7 @@ Route::group(["prefix" => "project", "middleware" => ["auth:api", "projectManage
 });
 
 Route::group(["prefix" => "finance", "middleware" => ["auth:api", "financeManager"], "as" => "finance."], function () {
-    Route::get('/all', [PackageController::class, 'listAll']);
+    Route::get('/all', [PackageController::class, 'financeListAll']);
     Route::get('/all/reject/{id}', [PackageController::class, 'rejectApi']);
     Route::get('/all/approve/{id}', [PackageController::class, 'approveApi']);
 });
@@ -42,4 +42,7 @@ Route::group(["prefix" => "general", "middleware" => ["auth:api", "generalManage
     Route::get('/all', [PackageController::class, 'listAll']);
     Route::get('/all/reject/{id}', [PackageController::class, 'rejectApi']);
     Route::get('/all/approve/{id}', [PackageController::class, 'approveApi']);
+    Route::get('/user', [UserController::class, 'listApi']);
+    Route::get('/user/reject/{id}', [UserController::class, 'rejectApi']);
+    Route::get('/user/approve/{id}', [UserController::class, 'approveApi']);
 });
